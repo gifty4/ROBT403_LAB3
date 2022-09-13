@@ -10,7 +10,7 @@ public:
 	SubscribeAndPublish()
 	{
 		// Topic you want to publish
-		pub_ = n_.advertise<std_msgs::Float64>("/joint4/command", 1000);
+		pub_ = n_.advertise<std_msgs::Float64>("/motortom2m/command", 1000);
 
 		// Topic you want to subscribe
 		sub_ = n_.subscribe("chatter", 1, &SubscribeAndPublish::chatterCallback, this);
@@ -18,21 +18,19 @@ public:
 
 	void chatterCallback(const std_msgs::String::ConstPtr &msg)
 	{
-		int num = std::stoi(msg->data.c_str());
-		if (num > prevNum)
+		std_msgs::Float64 msg_to_send;
+		double bias = 0;
+
+		double angle = 1;
+		if (turnLeft)
 		{
-			std_msgs::Float64 msg_to_send;
-			int angle = 1;
-			if (turnLeft)
-			{
-				angle = -angle;
-			}
-			msg_to_send.data = angle;
-			pub_.publish(msg_to_send);
-			ROS_INFO("ismoving goalpos to zero");
-			turnLeft = !turnLeft;
+			angle = -angle;
 		}
-		prevNum = num;
+		angle += bias;
+		msg_to_send.data = angle;
+		pub_.publish(msg_to_send);
+		ROS_INFO("moving");
+		turnLeft = !turnLeft;
 	}
 
 private:
@@ -41,7 +39,6 @@ private:
 	ros::Subscriber sub_;
 
 	bool turnLeft = true;
-	int prevNum = -1;
 };
 
 int main(int argc, char **argv)

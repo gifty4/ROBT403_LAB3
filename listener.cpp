@@ -19,14 +19,12 @@ public:
 	void chatterCallback(const std_msgs::String::ConstPtr &msg)
 	{
 		std_msgs::Float64 msg_to_send;
-		double bias = 0;
 
 		double angle = 1;
 		if (turnLeft)
 		{
 			angle = -angle;
 		}
-		angle += bias;
 		msg_to_send.data = angle;
 		pub_.publish(msg_to_send);
 		ROS_INFO("moving");
